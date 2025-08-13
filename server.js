@@ -8,8 +8,27 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// CORS config - place this BEFORE routes
+const allowedOrigins = [
+  'http://localhost:5173',           // your local dev frontend URL
+  'https://chennaiyin-jersey.vercel.app'  // your deployed frontend domain (no trailing slash)
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // allow requests with no origin like mobile apps or curl
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Middleware to parse JSON and URL encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
