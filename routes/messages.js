@@ -9,19 +9,28 @@ const auth = require('../middleware/auth');
 // =============================
 router.post('/send', auth, async (req, res) => {
   try {
-    const { userId, message, type } = req.body;
+    const { email, userId, message, type } = req.body;
 
-    if (!userId || !message) {
-      return res.status(400).json({ success: false, message: "UserId and message are required" });
+    // Accept either userId or email
+    if ((!userId && !email) || !message) {
+      return res.status(400).json({ success: false, message: "UserId/email and message are required" });
     }
 
-    const user = await User.findById(userId).select('name email');
+    // Find target user
+    let user;
+    if (userId) {
+      user = await User.findById(userId).select('name email');
+    } else if (email) {
+      user = await User.findOne({ email }).select('name email');
+    }
+
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(404).json({ success: false, message: "Target user not found" });
     }
 
+    // Save message for that user
     const newMessage = new Message({
-      userId,
+      userId: user._id,
       userName: user.name,
       message,
       type: type || "info",
@@ -46,11 +55,6 @@ router.post('/send', auth, async (req, res) => {
 // =============================
 router.get('/all', auth, async (req, res) => {
   try {
-    // Optional: restrict to superadmin only
-    // if (req.user.email !== "123@gmail.com") {
-    //   return res.status(403).json({ success: false, message: "Forbidden" });
-    // }
-
     const messages = await Message.find()
       .populate('userId', 'name email')
       .sort({ createdAt: -1 })
