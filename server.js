@@ -13,7 +13,6 @@ const allowedOrigins = [
   'http://localhost:5173',           // your local dev frontend URL
   'https://chennaiyin-jersey.vercel.app'  // your deployed frontend domain (no trailing slash)
 ];
-
 app.use(cors({
   origin: function(origin, callback) {
     // allow requests with no origin like mobile apps or curl
@@ -36,8 +35,10 @@ app.use(express.urlencoded({ extended: true }));
 const authRoutes = require('./routes/auth');
 const emailRoutes = require('./routes/email');
 const orderRoutes = require('./routes/orders');
+const messageRoutes = require('./routes/messages');
 
 app.use('/api/auth', authRoutes);
+app.use('/api/messages', messageRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/orders', orderRoutes);
 

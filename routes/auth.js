@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
+const auth = require('../middleware/auth'); // ✅ needed for protected routes
 
 const router = express.Router();
 
@@ -10,7 +11,9 @@ const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-// Sign up route
+// ==========================
+// Signup route
+// ==========================
 router.post('/signup', [
   body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
   body('email').isEmail().normalizeEmail().withMessage('Please enter a valid email'),
@@ -39,13 +42,7 @@ router.post('/signup', [
     }
 
     // Create new user
-    const user = new User({
-      name,
-      email,
-      password,
-      phone
-    });
-
+    const user = new User({ name, email, password, phone });
     await user.save();
 
     // Generate token
@@ -67,14 +64,13 @@ router.post('/signup', [
 
   } catch (error) {
     console.error('Signup error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
 
-// Sign in route
+// ==========================
+// Signin route
+// ==========================
 router.post('/signin', [
   body('email').isEmail().normalizeEmail().withMessage('Please enter a valid email'),
   body('password').notEmpty().withMessage('Password is required')
@@ -129,10 +125,20 @@ router.post('/signin', [
 
   } catch (error) {
     console.error('Signin error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+// ==========================
+// Get all users (Admin only)
+// ==========================
+router.get('/all-users', auth, async (req, res) => {
+  try {
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    res.json({ success: true, data: { users } });
+  } catch (error) {
+    console.error("Get all users error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch all users" });
   }
 });
 

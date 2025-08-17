@@ -142,6 +142,26 @@ router.delete('/:orderId', auth, async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to delete order' });
   }
 });
+// Get all orders (admin only)
+router.get('/all-orders', auth, async (req, res) => {
+  try {
+    // Optional: restrict to superadmin only
+    // if (req.user.email !== "123@gmail.com") {
+    //   return res.status(403).json({ success: false, message: "Forbidden" });
+    // }
+
+    const orders = await Order.find()
+      .populate('userId', 'name email phone')
+      .sort({ createdAt: -1 })
+      .lean(); // ✅ safer, prevents serialization issues
+
+    res.json({ success: true, data: { orders } });
+  } catch (error) {
+    console.error("Get all orders error:", error); // ✅ check Render logs
+    res.status(500).json({ success: false, message: "Failed to fetch all orders" });
+  }
+});
+
 
   // Get specific order
   router.get('/:orderId', auth, async (req, res) => {
