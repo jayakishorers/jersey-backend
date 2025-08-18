@@ -18,7 +18,12 @@ const messageSchema = new mongoose.Schema({
     type: String,
     enum: ['info', 'warning', 'error', 'success'],
     default: 'info'
+  },
+  read: {                // <-- ADD THIS
+    type: Boolean,
+    default: false
   }
 }, { timestamps: true });
+
 
 module.exports = mongoose.model('Message', messageSchema);

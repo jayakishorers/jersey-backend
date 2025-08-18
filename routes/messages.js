@@ -75,7 +75,7 @@ router.get('/all', auth, async (req, res) => {
 // =============================
 router.get('/my-messages', auth, async (req, res) => {
   try {
-    const messages = await Message.find({ userId: req.user.id })
+   const messages = await Message.find({ userId: req.user.userId })
       .sort({ createdAt: -1 })
       .lean();
 
@@ -92,7 +92,7 @@ router.get('/my-messages', auth, async (req, res) => {
 router.patch('/:id/read', auth, async (req, res) => {
   try {
     const message = await Message.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
+      { _id: req.params.id, userId: req.user.userId },
       { read: true },
       { new: true }
     );
