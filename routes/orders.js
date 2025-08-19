@@ -124,24 +124,66 @@ router.get('/my-orders', auth, async (req, res) => {
 });
 
   // Delete order by id (only owner can delete)
-router.delete('/:orderId', auth, async (req, res) => {
-  try {const order = await Order.findOne({ 
-  _id: req.params.orderId, 
-  'shippingAddress.email': req.user.email 
-});
+// DELETE /api/orders/:id
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const orderId = req.params.id;
+
+    const order = await Order.findByIdAndDelete(orderId);
 
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
     }
 
-    await order.remove();
-
-    res.json({ success: true, message: 'Order deleted successfully' });
+    res.json({
+      success: true,
+      message: 'Order deleted successfully'
+    });
   } catch (error) {
     console.error('Delete order error:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete order' });
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete order'
+    });
   }
 });
+
+// PATCH /api/orders/:id/status
+router.patch('/:id/status', auth, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const orderId = req.params.id;
+
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { orderStatus: status },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Order status updated successfully',
+      data: { order }
+    });
+  } catch (error) {
+    console.error('Update order status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update order status'
+    });
+  }
+});
+
 // Get all orders (admin only)
 router.get('/all-orders', auth, async (req, res) => {
   try {
