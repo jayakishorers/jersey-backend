@@ -23,9 +23,10 @@ app.use(cors({
     }
     return callback(null, true);
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], // ✅ Added PATCH
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 // Middleware to parse JSON and URL encoded data
 app.use(express.json());
