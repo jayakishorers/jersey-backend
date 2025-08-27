@@ -30,7 +30,6 @@ app.use(cors({
 // Middleware to parse JSON and URL encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api/stock", stockRoutes);
 // Routes
 const authRoutes = require('./routes/auth');
 const emailRoutes = require('./routes/email');
@@ -38,6 +37,7 @@ const stockRoutes = require("./routes/stock");
 const orderRoutes = require('./routes/orders');
 const messageRoutes = require('./routes/messages');
 
+app.use("/api/stock", stockRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/email', emailRoutes);
