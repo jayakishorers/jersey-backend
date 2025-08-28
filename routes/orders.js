@@ -33,7 +33,6 @@ router.post(
 
       const { items, totalAmount, shippingAddress, paymentMethod, notes } = req.body;
 
-      // 1️⃣ CHANGE: Create an order data object
       const orderData = {
         items,
         totalAmount,
@@ -42,7 +41,7 @@ router.post(
         notes,
       };
 
-      // 2️⃣ CHANGE: Conditionally add userId if a user is logged in
+      // Conditionally add userId only if a user is authenticated
       if (req.user && req.user.userId) {
         orderData.userId = req.user.userId;
       }
@@ -51,7 +50,7 @@ router.post(
 
       await order.save();
 
-      // 3️⃣ CHANGE: Conditionally populate userId to avoid crash on guest orders
+      // Conditionally populate userId to avoid crash on guest orders
       if (order.userId) {
         await order.populate('userId', 'name email');
       }
