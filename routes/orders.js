@@ -10,7 +10,6 @@ const router = express.Router();
  */
 router.post(
   '/create',
-  auth,
   [
     body('shippingAddress.name').notEmpty().withMessage('Name is required'),
     body('shippingAddress.email').isEmail().withMessage('Valid email is required'),
@@ -33,16 +32,21 @@ router.post(
       }
 
       const { items, totalAmount, shippingAddress, paymentMethod, notes } = req.body;
-
-      const order = new Order({
-        userId: req.user.userId,
-        orderNumber: `ORD-${Date.now()}`,
-        items,
-        totalAmount,
-        shippingAddress,
-        paymentMethod,
-        notes,
-      });
+// Inside the async (req, res) function for the /create route
+// Create an object to hold the order data
+const orderData = {
+  items,
+  totalAmount,
+  shippingAddress,
+  paymentMethod,
+  notes,
+};
+// Add the userId only if the user is authenticated (e.g., if you add back the auth middleware for logged-in users)
+if (req.user && req.user.userId) {
+  orderData.userId = req.user.userId;
+}
+const order = new Order(orderData);
+// The rest of your code remains the same
 
       await order.save();
       await order.populate('userId', 'name email');
