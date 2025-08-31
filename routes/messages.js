@@ -10,46 +10,11 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'chennaiyinjersey@gmail.com', // Your Gmail address
-        pass: 'zfjm cqjz ncjs pflw',      // Your App-specific password
+        pass: 'zfjm cqjz ncjs pflw',        // Your App-specific password
     },
 });
 
 // =============================
-// Send message to a user (Admin/Superadmin)
-// =============================
-router.post('/send', auth, async (req, res) => {
-    try {
-        // Ensure only an admin can perform this action
-        if (req.user.email !== "123@gmail.com") {
-            return res.status(403).json({ success: false, message: 'Forbidden: Admin only' });
-        }
-
-        const { userId, message, type, isBroadcast } = req.body;
-
-        if (!userId || !message) {
-            return res.status(400).json({ success: false, message: "UserId and message are required" });
-        }
-
-        // Find target user
-        const user = await User.findById(userId).select('name email');
-        if (!user) {
-            return res.status(404).json({ success: false, message: "Target user not found" });
-        }
-
-        // Save message for that user
-        const newMessage = new Message({
-            userId: user._id,
-            userName: user.name,
-            message,
-            type: type || "info",
-            read: false,
-            isBroadcast: isBroadcast || false // Store the broadcast flag
-        });
-
-        await newMessage.save();
-
-        // Check if the message is a broadcast and send an email
-        // =============================
 // Send message to a user (Admin/Superadmin)
 // =============================
 router.post('/send', auth, async (req, res) => {
@@ -84,7 +49,7 @@ router.post('/send', auth, async (req, res) => {
         await newMessage.save();
 
         // ----------------------------------------------------
-        // New code: The email logic is now outside the 'if' condition
+        // Corrected code: The email logic is now outside the conditional
         // ----------------------------------------------------
         const emailSubject = isBroadcast ? 'Important Announcement!' : 'You Have a New Message!';
         const emailHtml = `
@@ -114,18 +79,6 @@ router.post('/send', auth, async (req, res) => {
             }
         });
 
-        res.status(201).json({
-            success: true,
-            message: "Message sent successfully",
-            data: newMessage
-        });
-    } catch (err) {
-        console.error("Send message error:", err);
-        res.status(500).json({ success: false, message: "Failed to send message" });
-    }
-});
-
-// ... (all other routes remain the same)
         res.status(201).json({
             success: true,
             message: "Message sent successfully",
@@ -186,6 +139,7 @@ router.patch('/:id/read', auth, async (req, res) => {
 
         if (!message) {
             return res.status(404).json({ success: false, message: "Message not found" });
+            
         }
 
         res.json({ success: true, data: { message } });
