@@ -10,8 +10,8 @@ const router = express.Router();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'jayakishore0707@gmail.com', // Your Gmail address (e.g., yourstore@gmail.com)
-    pass: 'jntq jufv ckby ozit',   // The App-specific password for your Gmail account
+    user: 'chennaiyinjersey@gmail.com', // Your Gmail address (e.g., yourstore@gmail.com)
+    pass: 'zfjm cqjz ncjs pflw',   // The App-specific password for your Gmail account
   },
 });
 
@@ -85,7 +85,7 @@ router.post(
 
       const adminMailOptions = {
         from: 'your_email@gmail.com',
-        to: 'your_business_email@example.com', // Your business email to receive notifications
+        to: 'leeaj653@gmail.com', // Your business email to receive notifications
         subject: `New Order Received - #${order.orderNumber}`,
         html: adminEmailContent,
       };
