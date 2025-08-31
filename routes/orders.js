@@ -222,6 +222,8 @@ router.delete('/:id', auth, async (req, res) => {
 
 /**
  * Update order status (admin only)
+ *//**
+ * Update order status (admin only)
  */
 router.patch(
   '/:orderId/status',
@@ -257,9 +259,39 @@ router.patch(
 
       await order.save();
 
+      // New code block to send an email to the customer
+      const customerEmailContent = `
+        <h1>📦 Your Order Status Has Been Updated!</h1>
+        <p>Dear ${order.shippingAddress.name},</p>
+        <p>We're writing to let you know that the status of your order #${order.orderNumber} has been changed to: <strong>${orderStatus}</strong>.</p>
+        <p>You can view your order details and its current status by logging into your account.</p>
+        ${trackingNumber ? `
+          <p>Your tracking number is: <strong>${trackingNumber}</strong></p>
+          <p>You can track your package here: <a href="YOUR_TRACKING_URL_HERE">Track Your Order</a></p>
+        ` : ''}
+        <p>Thank you for your patience!</p>
+        <p>Best regards,</p>
+        <p>The Jersey Store Team</p>
+      `;
+
+      const customerMailOptions = {
+        from: 'chennaiyinjersey@gmail.com', // Your business email
+        to: order.shippingAddress.email, // The customer's email
+        subject: `Update on your Order #${order.orderNumber} - Status: ${orderStatus}`,
+        html: customerEmailContent,
+      };
+
+      transporter.sendMail(customerMailOptions, (error, info) => {
+        if (error) {
+          console.error('Error sending order status email:', error);
+        } else {
+          console.log('Order status email sent:', info.response);
+        }
+      });
+
       res.json({
         success: true,
-        message: 'Order status updated successfully',
+        message: 'Order status updated and email sent successfully',
         data: {
           order: {
             id: order._id,
