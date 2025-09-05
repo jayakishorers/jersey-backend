@@ -19,18 +19,19 @@
      * Create new order
      */
     router.post(
-    '/create',
-    auth,
-    [
-        body('shippingAddress.name').notEmpty().withMessage('Name is required'),
-        body('shippingAddress.email').isEmail().withMessage('Valid email is required'),
-        body('shippingAddress.contactNumber').notEmpty().withMessage('Contact number is required'),
-        body('shippingAddress.address').notEmpty().withMessage('Address is required'),
-        body('shippingAddress.city').notEmpty().withMessage('City is required'),
-        body('shippingAddress.district').notEmpty().withMessage('District is required'),
-        body('shippingAddress.state').notEmpty().withMessage('State is required'),
-        body('shippingAddress.pincode').notEmpty().withMessage('Pincode is required'),
-    ],
+  '/create',
+  auth,
+  [
+    body('shippingAddress.name').notEmpty().withMessage('Name is required'),
+    body('shippingAddress.email').isEmail().withMessage('Valid email is required'),
+    body('shippingAddress.contactNumber').notEmpty().withMessage('Contact number is required'),
+    body('shippingAddress.address').notEmpty().withMessage('Address is required'),
+    body('shippingAddress.city').notEmpty().withMessage('City is required'),
+    body('shippingAddress.district').notEmpty().withMessage('District is required'),
+    body('shippingAddress.state').notEmpty().withMessage('State is required'),
+    body('shippingAddress.pincode').notEmpty().withMessage('Pincode is required'),
+    body('shippingAddress.postOffice').notEmpty().withMessage('Post office is required'), // Add this line
+  ],
     async (req, res) => {
         try {
         const errors = validationResult(req);
